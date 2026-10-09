@@ -1,0 +1,79 @@
+==============================================================================================
+PART A — WHEN DOES AN INDEX BEAT A SCAN?
+==============================================================================================
+  index lookup = 3 random accesses = 36.12 ms      sequential block = 0.0403 ms
+
+  Fragment          blocks @S2   scan ms  break-even N
+  CONTAINER_C            2,637     118.2           3.3
+  CUSTOMS_DECL           1,890      88.1           2.4
+  GATE_MOVE            269,532  10,869.6         451.4
+
+  => the primary indexes on F1/F8 pay only for single-record access (U1, U3).
+     Any query needing more than ~4 records should scan. The optimiser must
+     choose per query — the same fragment is probed by U1 and scanned by Q1.
+
+==============================================================================================
+PART B — WORK AREA SPACE per query (at S2, the busiest site)
+==============================================================================================
+  Q5       8,164 KB   build side: YARD_SLOT_2 (220,000 x 38 B) for the hash join
+  Q3         756 KB   build side: open declarations (10% of 180,000) x 43 B
+  Q2         527 KB   build side: hazmat containers (5% of 200,000) x 54 B
+  Q7          79 KB   build side: VOYAGE_2 (1,440 x 50 B) + 360 aggregate groups
+  Q6          64 KB   pipelined scan + per-consignee result (~20 rows)
+  Q8          64 KB   4 partial results merged at the originating site (~20 containers)
+  Q1          31 KB   hash table on one yard block's slots (250) joined to container rows
+  Q4           1 KB   today's voyages (~10) joined to VESSEL
+
+  WAS = 8,164 KB = 7.97 MB   (driven by Q5)
+
+  Q5 — the work area is a CHOICE, not a requirement:
+    hash join      :   7.97 MB work area,        212 ms
+    index nested loop:   0.03 MB work area,  7,946,587 ms (132 min)
+    => 8.0 MB of buffer buys a 37,398x speed-up.
+
+==============================================================================================
+PART C — MEMORY PER SITE
+==============================================================================================
+  Site      WAS x4  B+ non-leaf  small idx  repl. reln  scan bufs    DBMS     TOTAL
+  S1          12.0         0.80       0.09        0.07       2.10      64      79.0
+  S2          31.9         2.13       0.33        0.07       2.10      64     100.5
+  S3          23.9         1.60       0.21        0.07       2.10      64      91.9
+  S4          12.0         0.80       0.10        0.07       2.10      64      79.0
+   (MB)
+
+==============================================================================================
+PART D — RESPONSE TIME PER QUERY (ms)
+==============================================================================================
+  Query            S1          S2          S3          S4   notes
+  Q1              124         231         189         124   local only
+  Q2              107         225         177         107   local only
+  Q3               77         165         130          77   local only
+  Q4               25          25          25          25   local only
+  Q5               95         212         165          95   local only
+  Q7               89         156         129          89   local only
+  Q6              217         211         221         226   4 sites in parallel
+                  577         581         579         593   if executed serially
+  Q8              620         615         625         629   4 sites in parallel
+                1,604       1,608       1,606       1,620   if executed serially
+  Q9              361         365         355         368   4 sites in parallel, a different sub-query at each
+                  675         679         677         691   if executed serially
+
+  Q9 local sub-queries:
+    S1:    63.9 ms   CONTAINER_C_1 + TANK_FARM
+    S2:   171.0 ms   CONTAINER_C_2 + RAIL_RAKE |><| RAKE_LOADING
+    S3:   350.3 ms   CONTAINER_C_3 + VOYAGE_3 |><| RORO_VEHICLE
+    S4:    64.8 ms   CONTAINER_C_4 + LIGHTERAGE
+
+  Update           S1          S2          S3          S4
+  U1               72          72          72          72   F2 probe + F6 insert
+  U2              108         108         108         108   F1 probe + F4 update
+  U3              144         144         144         144   F2 update + F8 update
+
+==============================================================================================
+PART E — DISK UTILISATION
+==============================================================================================
+  Site     busy ms/day   busy min/day   utilisation
+  S1           353,976            5.9         0.41%   (of which local transactions 0.1 min)
+  S2         1,562,943           26.0         1.81%   (of which local transactions 2.8 min)
+  S3         1,029,053           17.2         1.19%   (of which local transactions 2.9 min)
+  S4           261,090            4.4         0.30%   (of which local transactions 0.0 min)

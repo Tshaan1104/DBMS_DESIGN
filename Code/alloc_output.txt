@@ -1,0 +1,109 @@
+====================================================================================================
+PART A — LOCALITY OF THE FRAGMENTED ALLOCATION
+====================================================================================================
+  transactions served entirely locally :   31,175/day
+  cross-site transactions (Q6, Q8, Q9) :      310/day
+  remote fragment accesses they cause  :      930/day
+  locality = 1 - 930/32,415 = 97.13% of global accesses are local
+  + local transactions L1-L8 (local autonomy, always local): 5,220/day
+  locality including local transactions = 97.53%
+
+====================================================================================================
+PART B — THE REPLICATION BREAK-EVEN
+====================================================================================================
+  A local replica saves, per read:        Td + 2Tp  = 5.27 .. 14.90 ms
+  A replica costs, per update:  local_update + 2Tp  = 77.43 .. 87.06 ms
+
+  => a fragment must be read 6x to 15x more often than it is updated,
+     AT THAT SITE, before a replica breaks even.
+
+====================================================================================================
+PART C — ALL BENEFICIAL SITES: FRAGMENTED RELATIONS
+====================================================================================================
+
+  F1  (writes: container lifecycle: 41,000 inserts + 41,000 deletes + 6,160 migrations = 88,160/day network-wide)
+   home  replica at    benefit ms/day     cost ms/day             B - C  decision
+   S2    S1                       237       2,730,322        -2,730,085  no
+   S2    S3                       874       2,887,051        -2,886,177  no
+   S2    S4                       495       3,043,780        -3,043,284  no
+
+  F6  (writes: U1 gate moves = 23,200/day network-wide)
+   home  replica at    benefit ms/day     cost ms/day             B - C  decision
+   S2    S1                       132         718,506          -718,374  no
+   S2    S3                       534         759,750          -759,216  no
+   S2    S4                       283         800,995          -800,711  no
+
+  F8  (writes: U3 clearance + declaration filing = 43,780/day network-wide)
+   home  replica at    benefit ms/day     cost ms/day             B - C  decision
+   S2    S1                        79       1,355,870        -1,355,791  no
+   S2    S3                       291       1,433,701        -1,433,410  no
+   S2    S4                       142       1,511,532        -1,511,391  no
+
+====================================================================================================
+PART D — ALL BENEFICIAL SITES: UNFRAGMENTED RELATIONS
+====================================================================================================
+
+  G1 PORT  (1 blocks, reads: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q7', 'Q9'], 0.01/day updates)
+   replica at    reads/day  benefit ms/day   cost ms/day         B - C  decision
+   S1                  300         1,580.1           0.3       1,579.8  REPLICATE
+   S3                  625         6,069.7           0.3       6,069.4  REPLICATE
+   S4                  235         3,326.7           0.4       3,326.3  REPLICATE
+
+  G2 SHIPPING_LINE  (3 blocks, reads: ['Q7'], 0.1/day updates)
+   replica at    reads/day  benefit ms/day   cost ms/day         B - C  decision
+   S1                   20           105.3           2.9         102.4  REPLICATE
+   S3                   45           437.0           3.4         433.6  REPLICATE
+   S4                   15           212.3           3.8         208.5  REPLICATE
+
+  G3 VESSEL  (11 blocks, reads: ['Q4', 'Q7'], 1.0/day updates)
+   replica at    reads/day  benefit ms/day   cost ms/day         B - C  decision
+   S1                   45           237.0          77.4         159.6  REPLICATE
+   S3                   90           874.0          81.9         792.2  REPLICATE
+   S4                   35           495.5          86.3         409.1  REPLICATE
+
+  G4 HS_CODE_MASTER  (69 blocks, reads: NONE in the workload, 0.2/day updates)
+     no read demand anywhere -> benefit = 0 at every site. SINGLE COPY at S2.
+
+  G5 SERVICE  (1 blocks, reads: ['Q8'], 0.01/day updates)
+   replica at    reads/day  benefit ms/day   cost ms/day         B - C  decision
+   S1                   25           131.7           0.3         131.4  REPLICATE
+   S3                   55           534.1           0.3         533.8  REPLICATE
+   S4                   20           283.1           0.4         282.7  REPLICATE
+
+  G6 PINCODE  (225 blocks, reads: NONE in the workload, 0.1/day updates)
+     no read demand anywhere -> benefit = 0 at every site. SINGLE COPY at S2.
+
+  G7 CONSIGNEE_H  (430 blocks, reads: ['Q6', 'Q8'], 20.0/day updates)
+   replica at    reads/day  benefit ms/day   cost ms/day         B - C  decision
+   S1                   40           210.7       1,548.5      -1,337.8  no
+   S3                1,045        10,148.6       1,637.4       8,511.2  REPLICATE
+   S4                   30           424.7       1,726.3      -1,301.6  no
+
+  G8 CONSIGNEE_R  (831 blocks, reads: NONE in the workload, 20.0/day updates)
+     no read demand anywhere -> benefit = 0 at every site. SINGLE COPY at S2.
+
+  G9 CONSIGNEE_PHONE  (235 blocks, reads: NONE in the workload, 15.0/day updates)
+     no read demand anywhere -> benefit = 0 at every site. SINGLE COPY at S2.
+
+====================================================================================================
+PART E — FINAL ALLOCATION
+====================================================================================================
+  Relation               copies  sites
+  PORT                        4  S1, S2, S3, S4
+  SHIPPING_LINE               4  S1, S2, S3, S4
+  VESSEL                      4  S1, S2, S3, S4
+  HS_CODE_MASTER              1  S2
+  SERVICE                     4  S1, S2, S3, S4
+  PINCODE                     1  S2
+  CONSIGNEE_H                 2  S2, S3
+  CONSIGNEE_R                 1  S2
+  CONSIGNEE_PHONE             1  S2
+
+  Fragments F1-F12: exactly one copy each, at the site named by its port predicate.
+
+  Site    core data  core idx  local data  local idx  global rel     total      MB
+  S1        104,444    42,085          50          0          16   146,595     600
+  S2        278,507   112,206       8,022         35       1,806   400,576    1641
+  S3        208,882    84,158       9,298      2,163         446   304,947    1249
+  S4        104,444    42,085          30          1          16   146,576     600
+  ALL       696,277   280,534      17,400      2,199       2,284   998,694    4091

@@ -1,0 +1,116 @@
+================================================================================================
+DERIVED DISK PARAMETERS
+================================================================================================
+  block transfer time  Tr = (B + g)/transfer rate = (4096 + 128)/104,857,600 = 0.0403 ms
+  transmission delay   Td = 1024/12,500,000 = 0.0819 ms per packet
+  propagation delay    Tp = distance / 2.7e+08 m/s
+      S1-S2:   700 km -> Tp = 2.59 ms,  2Tp = 5.19 ms
+      S1-S3:   700 km -> Tp = 2.59 ms,  2Tp = 5.19 ms
+      S1-S4:  2000 km -> Tp = 7.41 ms,  2Tp = 14.81 ms
+      S2-S3:  1300 km -> Tp = 4.81 ms,  2Tp = 9.63 ms
+      S2-S4:  1900 km -> Tp = 7.04 ms,  2Tp = 14.07 ms
+      S3-S4:  1650 km -> Tp = 6.11 ms,  2Tp = 12.22 ms
+
+================================================================================================
+BLOCKING — spanned, fixed-length records;  blocks = ceil(n x R / B)
+================================================================================================
+ID   Fragment                R   bfr        S1 blks     S2 blks     S3 blks     S4 blks  total blks
+F1   CONTAINER_C            54    75            989       2,637       1,978         989       6,593
+F2   CONTAINER_G            33   124            605       1,612       1,209         605       4,031
+F3   VOYAGE                 50    81              7          18          14           7          46
+F4   YARD_SLOT              38   107             84         223         167          84         558
+F5   YARD_BLOCK             12   341              1           1           1           1           4
+F6   GATE_MOVE              46    89        101,075     269,532     202,149     101,075     673,831
+F7   TARIFF                 18   227              1           1           1           1           4
+F8   CUSTOMS_DECL           43    95            709       1,890       1,418         709       4,726
+F9   BILL_OF_LADING         36   113            238         633         475         238       1,584
+F10  CONTAINER_REEFER       23   178             34          90          68          34         226
+F11  CONTAINER_TANK         23   178             13          34          26          13          86
+F12  CONTAINER_OPEN_TOP     15   273              6          15          11           6          38
+     PER-SITE TOTAL                         103,762     276,686     207,517     103,762     691,727
+
+ID   Unfragmented relation   R   bfr      tuples    blocks
+G1   PORT                   70    58           4         1
+G2   SHIPPING_LINE          84    48         120         3
+G3   VESSEL                 52    78         800        11
+G4   HS_CODE_MASTER         56    73       5,000        69
+G5   SERVICE                39   105          10         1
+G6   PINCODE                46    89      20,000       225
+G7   CONSIGNEE_H            44    93      40,000       430
+G8   CONSIGNEE_R            85    48      40,000       831
+G9   CONSIGNEE_PHONE        16   256      60,000       235
+     TOTAL (one copy)                                1,806
+
+================================================================================================
+ACCESS METHOD COMPARISON — F6 GATE_MOVE at S2 (largest fragment)
+================================================================================================
+  records = 24,000,000   data blocks = 269,532   file size = 1104 MB   distinct cont_id = 6,000,000
+
+Method                                                      idx blks  idx MB  accesses
+(a) Heap file, no index                                            0       0    269532
+                                                          full scan
+(b) Primary index on move_id (3 levels, bfri=341)                795       3         4
+                                                          useless: no query searches by move_id
+(c) Clustering index on cont_id (3 levels, bfri=215)          28,038     115         4
+                                                          ordered file conflicts with U1 append
+(d) Secondary index on truck_no (4 levels, bfri=227)         106,197     435         5
+                                                          no query searches by truck_no
+(e) B+ tree on cont_id (h=4, p_leaf=215, p=216)              112,149     459         5
+                                                          heap file stays append-friendly for U1
+
+  full scan time        = S + L + N x Tr = 10,870 ms (10.9 s)
+  B+ tree lookup (one container's ~4 moves) = 4 index + 1 data block = 60.20 ms
+  speed-up = 181x
+  index overhead = 459 MB on a 1104 MB fragment (42%)
+
+================================================================================================
+CHOSEN ACCESS METHOD PER FRAGMENT (index blocks at each site)
+================================================================================================
+ID   Access method                                    S1         S2         S3         S4  accesses
+F1   primary index on cont_id                          6         14         11          6         3
+F2   primary index on cont_id                          4          9          7          4         3
+F3   primary index on voyage_id                        1          1          1          1         2
+F4   primary index on (block,bay,row,tier)             1          3          3          1         2
+F5   none - single block                               0          0          0          0         1
+F6   B+ tree on cont_id over heap                 42,056    112,149     84,112     42,056         4
+F7   none - single block                               0          0          0          0         1
+F8   primary index on cont_id                          5         10          8          5         3
+F9   primary index on bl_no                            3          5          4          3         3
+F10  primary index on cont_id                          1          1          1          1         2
+F11  primary index on cont_id                          1          1          1          1         2
+F12  primary index on cont_id                          1          1          1          1         2
+     INDEX BLOCKS TOTAL                           42,079    112,194     84,149     42,079
+
+================================================================================================
+FRAGMENT ACCESS TIMES (ms) — full-fragment scan at its home site
+================================================================================================
+  local retrieval  = S + L + N x Tr
+  local update     = 2 x (S + L + Tr) x N_touched
+  remote retrieval = local + Td_total + 2Tp
+  remote update    = local + 2Tp
+
+ID   Fragment                   S1 scan      S2 scan      S3 scan      S4 scan
+F1   CONTAINER_C                   51.8        118.2         91.7         51.8
+F2   CONTAINER_G                   36.4         76.9         60.7         36.4
+F3   VOYAGE                        12.3         12.7         12.6         12.3
+F4   YARD_SLOT                     15.4         21.0         18.7         15.4
+F5   YARD_BLOCK                    12.0         12.0         12.0         12.0
+F6   GATE_MOVE                  4,083.6     10,869.6      8,155.2      4,083.6
+F7   TARIFF                        12.0         12.0         12.0         12.0
+F8   CUSTOMS_DECL                  40.6         88.1         69.1         40.6
+F9   BILL_OF_LADING                21.6         37.5         31.1         21.6
+F10  CONTAINER_REEFER              13.4         15.6         14.7         13.4
+F11  CONTAINER_TANK                12.5         13.4         13.0         12.5
+F12  CONTAINER_OPEN_TOP            12.2         12.6         12.4         12.2
+
+  Single-record access with the chosen index (any site):
+    F1: 2 index + 1 data = 36.12 ms local; update = 72.24 ms
+    F2: 2 index + 1 data = 36.12 ms local; update = 72.24 ms
+    F8: 2 index + 1 data = 36.12 ms local; update = 72.24 ms
+    F6: 4 index + 1 data = 60.20 ms local; insert (U1) = append 1 block + 4 index = 120.40 ms
+
+  Remote single-record retrieval of F2 (gate fragment, 33 B result = 1 packet):
+    S1 -> S2: 36.12 + 0.082 + 5.19 = 41.39 ms   (1.1x the local cost)
+    S2 -> S3: 36.12 + 0.082 + 9.63 = 45.83 ms   (1.3x the local cost)
+    S1 -> S4: 36.12 + 0.082 + 14.81 = 51.02 ms   (1.4x the local cost)
+    S2 -> S4: 36.12 + 0.082 + 14.07 = 50.28 ms   (1.4x the local cost)

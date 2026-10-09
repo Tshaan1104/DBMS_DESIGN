@@ -1,0 +1,46 @@
+================================================================================================
+LOCAL RELATIONS — definitions and physical design
+================================================================================================
+ID   Site Relation               R     tuples  blocks       index idx blks  why
+R20  S1   TANK_FARM             44         60       1        none        0  single block
+R21  S1   PIPELINE_TRANSFER     45      4,400      49        none        0  insert-only; no transaction searches it
+R22  S2   RAIL_RAKE             40     11,000     108     primary        1  L3 updates status by rake_id; file is in rake_id order
+R23  S2   RAKE_LOADING          31  1,000,000   7,569  clustering       34  Q9 reads by rake_id; inserts arrive in rake order
+R24  S2   SEZ_UNIT              57        200       3        none        0  three blocks; a scan is one seek
+R25  S2   BOND_TRANSFER         35     40,000     342        none        0  insert-only; no transaction searches it
+R26  S3   RORO_VEHICLE          68    350,000   5,811       bplus    2,163  L6 looks up by vin; arrival order is not vin order
+R27  S3   VEHICLE_INSPECTION    34    420,000   3,487        none        0  insert-only; no transaction searches it
+R28  S4   TIDAL_WINDOW          32        730       6        none        0  insert-only planning reference; six blocks
+R29  S4   LIGHTERAGE            44      2,200      24     primary        1  L7 closes an operation by op_id
+
+Site    local data  local index  relations
+S1              50            0          2   New Mangalore
+S2           8,022           35          4   JNPT
+S3           9,298        2,163          2   Chennai
+S4              30            1          2   Kolkata/Haldia
+
+================================================================================================
+LOCAL TRANSACTIONS (local autonomy — invisible to the global layer)
+================================================================================================
+  L1 S1  Record tank gauging                  240/day     24.1 ms   UPDATE TANK_FARM
+  L2 S1  Record pipeline transfer              12/day     24.1 ms   INSERT PIPELINE_TRANSFER
+  L3 S2  Load container onto rake           2,740/day     60.2 ms   INSERT RAKE_LOADING; close CONTAINER_C_2 row
+  L4 S2  Transfer container to SEZ unit       110/day     36.2 ms   read SEZ_UNIT; INSERT BOND_TRANSFER
+  L5 S3  Register RoRo vehicle for export     960/day    108.4 ms   FK check CONSIGNEE_H; INSERT RORO_VEHICLE
+  L6 S3  Record vehicle inspection          1,150/day     60.2 ms   probe RORO_VEHICLE by vin; INSERT VEHICLE_INSPECTION
+  L7 S4  Open / close lighterage operation      6/day     48.2 ms   INSERT or UPDATE LIGHTERAGE
+  L8 S4  Publish tidal window                   2/day     24.1 ms   INSERT TIDAL_WINDOW
+  total 5,220/day
+
+================================================================================================
+Q9 — CARGO IN CUSTODY: a different sub-query at every site
+================================================================================================
+  S1 New Mangalore       63.9 ms   CONTAINER_C_1 + TANK_FARM
+  S2 JNPT               171.0 ms   CONTAINER_C_2 + RAIL_RAKE |><| RAKE_LOADING
+  S3 Chennai            350.3 ms   CONTAINER_C_3 + VOYAGE_3 |><| RORO_VEHICLE
+  S4 Kolkata/Haldia      64.8 ms   CONTAINER_C_4 + LIGHTERAGE
+
+  originating at S1: parallel    361 ms   serial    675 ms
+  originating at S2: parallel    365 ms   serial    679 ms
+  originating at S3: parallel    355 ms   serial    677 ms
+  originating at S4: parallel    368 ms   serial    691 ms

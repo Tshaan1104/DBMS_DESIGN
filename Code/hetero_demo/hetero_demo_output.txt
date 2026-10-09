@@ -1,0 +1,49 @@
+========================================================================================
+1. LOCAL CONCEPTUAL SCHEMAS — relations present at each site
+========================================================================================
+  s1 New Mangalore    18 relations   = 16 common core + 2 site-specific: pipeline_transfer, tank_farm
+  s2 JNPT             25 relations   = 16 common core + 9 site-specific: bond_transfer, consignee_h, consignee_phone, consignee_r, hs_code_master, pincode, rail_rake, rake_loading, sez_unit
+  s3 Chennai          19 relations   = 16 common core + 3 site-specific: consignee_h, roro_vehicle, vehicle_inspection
+  s4 Kolkata/Haldia   18 relations   = 16 common core + 2 site-specific: lighterage, tidal_window
+
+  PASS  LCS_1 != LCS_2   (11 relations differ)
+  PASS  LCS_1 != LCS_3   (5 relations differ)
+  PASS  LCS_1 != LCS_4   (4 relations differ)
+  PASS  LCS_2 != LCS_3   (10 relations differ)
+  PASS  LCS_2 != LCS_4   (11 relations differ)
+  PASS  LCS_3 != LCS_4   (5 relations differ)
+
+========================================================================================
+2. SHARED CORE — identical structure at every site
+========================================================================================
+  PASS  16 core relations have identical columns at all four sites
+
+========================================================================================
+3. Q9 THROUGH THE GLOBAL GAV VIEW  vs  value computed independently
+========================================================================================
+  port cargo class           global view (t)   expected (t)
+  1    CONTAINER                     542.314        542.314  PASS
+  1    LIQUID_BULK                52,447.569     52,447.569  PASS
+  2    CONTAINER                   1,567.289      1,567.289  PASS
+  2    CONTAINER_ON_RAIL             247.233        247.233  PASS
+  3    CONTAINER                   1,116.886      1,116.886  PASS
+  3    RORO                           61.565         61.565  PASS
+  4    CONTAINER                     566.327        566.327  PASS
+  4    CONTAINER_AFLOAT              412.500        412.500  PASS
+  s1 exports classes: CONTAINER, LIQUID_BULK
+  s2 exports classes: CONTAINER, CONTAINER_ON_RAIL
+  s3 exports classes: CONTAINER, RORO
+  s4 exports classes: CONTAINER, CONTAINER_AFLOAT
+
+========================================================================================
+4. CUSTODY CONSERVATION — each port's own boundary events, no double counting
+========================================================================================
+  PASS  JNPT  load 5 containers onto open rake: 1,814.522 t -> 1,814.522 t (conserved)
+  PASS  JNPT  rake departs: custody falls by exactly the rake's 347.666 t
+  PASS  HALDIA barge lands, 24 containers enter the yard: 978.827 t -> 978.827 t (conserved)
+  PASS  CHENNAI RoRo voyage sails: custody falls by exactly the 61.565 t of vehicles aboard
+  PASS  NEW MANGALORE 500 kl pumped out at density 0.876: custody falls by 438.000 t
+
+========================================================================================
+RESULT: ALL CHECKS PASS
+========================================================================================

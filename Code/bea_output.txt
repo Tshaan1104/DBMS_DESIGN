@@ -1,0 +1,345 @@
+
+==============================================================================
+RELATION: CONTAINER   (12 attributes after key exclusion)
+==============================================================================
+
+ATTRIBUTE USAGE MATRIX (rows = transactions)
+          A2    A3    A4    A5    A6    A7    A8    A9   A10   A11   A12   A13    freq
+  Q1       1     1     0     1     1     0     0     0     0     0     1     0      860
+  Q2       0     0     0     0     0     1     0     0     0     0     1     0      200
+  Q3       0     0     0     0     0     0     0     0     0     1     1     0      325
+  Q5       1     0     1     1     0     0     0     0     0     0     1     0      410
+  Q6       0     0     0     0     0     0     0     1     0     0     1     0      105
+  Q7       1     0     0     0     0     0     1     0     0     0     1     1      150
+  Q8       0     0     0     0     0     0     0     1     1     0     1     0      180
+  Q9       0     0     0     1     0     0     0     0     0     0     1     0       25
+  U1       0     0     0     0     1     0     0     0     0     1     0     0    23200
+  U2       1     0     0     0     0     1     0     0     0     0     0     0     3100
+  U3       0     0     0     0     0     0     0     0     0     1     0     0     2780
+
+ATTRIBUTE AFFINITY MATRIX
+            A2      A3      A4      A5      A6      A7      A8      A9     A10     A11     A12     A13
+  A2      4520     860     410    1270     860    3100     150       0       0       0    1420     150
+  A3       860     860       0     860     860       0       0       0       0       0     860       0
+  A4       410       0     410     410       0       0       0       0       0       0     410       0
+  A5      1270     860     410    1295     860       0       0       0       0       0    1295       0
+  A6       860     860       0     860   24060       0       0       0       0   23200     860       0
+  A7      3100       0       0       0       0    3300       0       0       0       0     200       0
+  A8       150       0       0       0       0       0     150       0       0       0     150     150
+  A9         0       0       0       0       0       0       0     285     180       0     285       0
+  A10        0       0       0       0       0       0       0     180     180       0     180       0
+  A11        0       0       0       0   23200       0       0       0       0   26305     325       0
+  A12     1420     860     410    1295     860     200     150     285     180     325    2255     150
+  A13      150       0       0       0       0       0     150       0       0       0     150     150
+
+BEA ORDERING
+  place A4: max contribution 6,248,400 at position 1
+  place A5: max contribution 18,995,500 at position 2
+  place A6: max contribution 87,204,000 at position 4
+  place A7: max contribution 35,701,500 at position 3
+  place A8: max contribution 516,000 at position 7
+  place A9: max contribution 233,700 at position 1
+  place A10: max contribution 270,000 at position 1
+  place A11: max contribution 2,330,658,000 at position 8
+  place A12: max contribution 38,382,100 at position 7
+  place A13: max contribution 180,000 at position 11
+  clustered order: A10 A9 A4 A5 A7 A2 A12 A6 A11 A3 A13 A8
+
+CLUSTERED AFFINITY MATRIX
+           A10      A9      A4      A5      A7      A2     A12      A6     A11      A3     A13      A8
+  A10      180     180       0       0       0       0     180       0       0       0       0       0
+  A9       180     285       0       0       0       0     285       0       0       0       0       0
+  A4         0       0     410     410       0     410     410       0       0       0       0       0
+  A5         0       0     410    1295       0    1270    1295     860       0     860       0       0
+  A7         0       0       0       0    3300    3100     200       0       0       0       0       0
+  A2         0       0     410    1270    3100    4520    1420     860       0     860     150     150
+  A12      180     285     410    1295     200    1420    2255     860     325     860     150     150
+  A6         0       0       0     860       0     860     860   24060   23200     860       0       0
+  A11        0       0       0       0       0       0     325   23200   26305       0       0       0
+  A3         0       0       0     860       0     860     860     860       0     860       0       0
+  A13        0       0       0       0       0     150     150       0       0       0     150     150
+  A8         0       0       0       0       0     150     150       0       0       0     150     150
+
+SPLIT QUALITY  Z = (CTQ x CBQ) - COQ^2
+  cut  1: TA={A10}  TB={A9,A4,A5,A7,A2,A12,A6,A11,A3,A13,A8}
+          TQ=[] BQ=['Q1', 'Q2', 'Q3', 'Q5', 'Q6', 'Q7', 'Q9', 'U1', 'U2', 'U3'] OQ=['Q8']
+          CTQ=0  CBQ=31,155  COQ=180   Z=-32,400
+  cut  2: TA={A10,A9}  TB={A4,A5,A7,A2,A12,A6,A11,A3,A13,A8}
+          TQ=[] BQ=['Q1', 'Q2', 'Q3', 'Q5', 'Q7', 'Q9', 'U1', 'U2', 'U3'] OQ=['Q6', 'Q8']
+          CTQ=0  CBQ=31,050  COQ=285   Z=-81,225
+  cut  3: TA={A10,A9,A4}  TB={A5,A7,A2,A12,A6,A11,A3,A13,A8}
+          TQ=[] BQ=['Q1', 'Q2', 'Q3', 'Q7', 'Q9', 'U1', 'U2', 'U3'] OQ=['Q5', 'Q6', 'Q8']
+          CTQ=0  CBQ=30,640  COQ=695   Z=-483,025
+  cut  4: TA={A10,A9,A4,A5}  TB={A7,A2,A12,A6,A11,A3,A13,A8}
+          TQ=[] BQ=['Q2', 'Q3', 'Q7', 'U1', 'U2', 'U3'] OQ=['Q1', 'Q5', 'Q6', 'Q8', 'Q9']
+          CTQ=0  CBQ=29,755  COQ=1,580   Z=-2,496,400
+  cut  5: TA={A10,A9,A4,A5,A7}  TB={A2,A12,A6,A11,A3,A13,A8}
+          TQ=[] BQ=['Q3', 'Q7', 'U1', 'U3'] OQ=['Q1', 'Q2', 'Q5', 'Q6', 'Q8', 'Q9', 'U2']
+          CTQ=0  CBQ=26,455  COQ=4,880   Z=-23,814,400
+  cut  6: TA={A10,A9,A4,A5,A7,A2}  TB={A12,A6,A11,A3,A13,A8}
+          TQ=['U2'] BQ=['Q3', 'U1', 'U3'] OQ=['Q1', 'Q2', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9']
+          CTQ=3,100  CBQ=26,305  COQ=1,930   Z=77,820,600
+  cut  7: TA={A10,A9,A4,A5,A7,A2,A12}  TB={A6,A11,A3,A13,A8}
+          TQ=['Q2', 'Q5', 'Q6', 'Q8', 'Q9', 'U2'] BQ=['U1', 'U3'] OQ=['Q1', 'Q3', 'Q7']
+          CTQ=4,020  CBQ=25,980  COQ=1,335   Z=102,657,375
+  cut  8: TA={A10,A9,A4,A5,A7,A2,A12,A6}  TB={A11,A3,A13,A8}
+          TQ=['Q2', 'Q5', 'Q6', 'Q8', 'Q9', 'U2'] BQ=['U3'] OQ=['Q1', 'Q3', 'Q7', 'U1']
+          CTQ=4,020  CBQ=2,780  COQ=24,535   Z=-590,790,625
+  cut  9: TA={A10,A9,A4,A5,A7,A2,A12,A6,A11}  TB={A3,A13,A8}
+          TQ=['Q2', 'Q3', 'Q5', 'Q6', 'Q8', 'Q9', 'U1', 'U2', 'U3'] BQ=[] OQ=['Q1', 'Q7']
+          CTQ=30,325  CBQ=0  COQ=1,010   Z=-1,020,100
+  cut 10: TA={A10,A9,A4,A5,A7,A2,A12,A6,A11,A3}  TB={A13,A8}
+          TQ=['Q1', 'Q2', 'Q3', 'Q5', 'Q6', 'Q8', 'Q9', 'U1', 'U2', 'U3'] BQ=[] OQ=['Q7']
+          CTQ=31,185  CBQ=0  COQ=150   Z=-22,500
+  cut 11: TA={A10,A9,A4,A5,A7,A2,A12,A6,A11,A3,A13}  TB={A8}
+          TQ=['Q1', 'Q2', 'Q3', 'Q5', 'Q6', 'Q8', 'Q9', 'U1', 'U2', 'U3'] BQ=[] OQ=['Q7']
+          CTQ=31,185  CBQ=0  COQ=150   Z=-22,500
+
+  BEST SPLIT: Z = 102,657,375 at cut 7
+    F_a: cont_id (key) + A2=size_ft, A4=tare_wt, A5=gross_wt, A7=hazmat_class, A9=consignee_id, A10=invoice_value, A12=cur_port_id
+    F_b: cont_id (key) + A3=cont_type, A6=seal_no, A8=line_id, A11=customs_status, A13=voyage_id
+    record sizes: F_a=42B  F_b=45B   (original 76B, overhead +11B from key replication)
+
+==============================================================================
+RELATION: CUSTOMS_DECL   (6 attributes after key exclusion)
+==============================================================================
+
+ATTRIBUTE USAGE MATRIX (rows = transactions)
+          A2    A3    A4    A5    A6    A7    freq
+  Q3       1     0     0     1     1     0      325
+  Q6       1     0     1     0     0     0      105
+  U3       1     0     0     0     1     0     2780
+
+ATTRIBUTE AFFINITY MATRIX
+            A2      A3      A4      A5      A6      A7
+  A2      3210       0     105     325    3105       0
+  A3         0       0       0       0       0       0
+  A4       105       0     105       0       0       0
+  A5       325       0       0     325     325       0
+  A6      3105       0       0     325    3105       0
+  A7         0       0       0       0       0       0
+
+BEA ORDERING
+  place A4: max contribution 696,150 at position 1
+  place A5: max contribution 4,316,000 at position 3
+  place A6: max contribution 39,383,300 at position 2
+  place A7: max contribution 0 at position 1
+  clustered order: A7 A4 A6 A2 A5 A3
+
+CLUSTERED AFFINITY MATRIX
+            A7      A4      A6      A2      A5      A3
+  A7         0       0       0       0       0       0
+  A4         0     105       0     105       0       0
+  A6         0       0    3105    3105     325       0
+  A2         0     105    3105    3210     325       0
+  A5         0       0     325     325     325       0
+  A3         0       0       0       0       0       0
+
+SPLIT QUALITY  Z = (CTQ x CBQ) - COQ^2
+  cut  1: TA={A7}  TB={A4,A6,A2,A5,A3}
+          TQ=[] BQ=['Q3', 'Q6', 'U3'] OQ=[]
+          CTQ=0  CBQ=3,210  COQ=0   Z=0
+  cut  2: TA={A7,A4}  TB={A6,A2,A5,A3}
+          TQ=[] BQ=['Q3', 'U3'] OQ=['Q6']
+          CTQ=0  CBQ=3,105  COQ=105   Z=-11,025
+  cut  3: TA={A7,A4,A6}  TB={A2,A5,A3}
+          TQ=[] BQ=[] OQ=['Q3', 'Q6', 'U3']
+          CTQ=0  CBQ=0  COQ=3,210   Z=-10,304,100
+  cut  4: TA={A7,A4,A6,A2}  TB={A5,A3}
+          TQ=['Q6', 'U3'] BQ=[] OQ=['Q3']
+          CTQ=2,885  CBQ=0  COQ=325   Z=-105,625
+  cut  5: TA={A7,A4,A6,A2,A5}  TB={A3}
+          TQ=['Q3', 'Q6', 'U3'] BQ=[] OQ=[]
+          CTQ=3,210  CBQ=0  COQ=0   Z=0
+
+  BEST SPLIT: Z = 0 at cut 1
+    F_a: decl_id (key) + A7=officer_id
+    F_b: decl_id (key) + A2=cont_id, A3=hs_code, A4=duty_amt, A5=filed_on, A6=cleared_on
+    record sizes: F_a=8B  F_b=39B   (original 43B, overhead +4B from key replication)
+    COLD (no transaction touches): A3=hs_code, A7=officer_id
+
+==============================================================================
+RELATION: VOYAGE   (7 attributes after key exclusion)
+==============================================================================
+
+ATTRIBUTE USAGE MATRIX (rows = transactions)
+          A2    A3    A4    A5    A6    A7    A8    freq
+  Q4       1     1     1     1     0     1     1      150
+  Q7       1     1     0     1     0     0     0      150
+  Q9       0     0     0     0     1     0     0       25
+
+ATTRIBUTE AFFINITY MATRIX
+            A2      A3      A4      A5      A6      A7      A8
+  A2       300     300     150     300       0     150     150
+  A3       300     300     150     300       0     150     150
+  A4       150     150     150     150       0     150     150
+  A5       300     300     150     300       0     150     150
+  A6         0       0       0       0      25       0       0
+  A7       150     150     150     150       0     150     150
+  A8       150     150     150     150       0     150     150
+
+BEA ORDERING
+  place A4: max contribution 405,000 at position 1
+  place A5: max contribution 675,000 at position 2
+  place A6: max contribution 0 at position 1
+  place A7: max contribution 405,000 at position 6
+  place A8: max contribution 270,000 at position 2
+  clustered order: A6 A8 A4 A5 A2 A3 A7
+
+CLUSTERED AFFINITY MATRIX
+            A6      A8      A4      A5      A2      A3      A7
+  A6        25       0       0       0       0       0       0
+  A8         0     150     150     150     150     150     150
+  A4         0     150     150     150     150     150     150
+  A5         0     150     150     300     300     300     150
+  A2         0     150     150     300     300     300     150
+  A3         0     150     150     300     300     300     150
+  A7         0     150     150     150     150     150     150
+
+SPLIT QUALITY  Z = (CTQ x CBQ) - COQ^2
+  cut  1: TA={A6}  TB={A8,A4,A5,A2,A3,A7}
+          TQ=['Q9'] BQ=['Q4', 'Q7'] OQ=[]
+          CTQ=25  CBQ=300  COQ=0   Z=7,500
+  cut  2: TA={A6,A8}  TB={A4,A5,A2,A3,A7}
+          TQ=['Q9'] BQ=['Q7'] OQ=['Q4']
+          CTQ=25  CBQ=150  COQ=150   Z=-18,750
+  cut  3: TA={A6,A8,A4}  TB={A5,A2,A3,A7}
+          TQ=['Q9'] BQ=['Q7'] OQ=['Q4']
+          CTQ=25  CBQ=150  COQ=150   Z=-18,750
+  cut  4: TA={A6,A8,A4,A5}  TB={A2,A3,A7}
+          TQ=['Q9'] BQ=[] OQ=['Q4', 'Q7']
+          CTQ=25  CBQ=0  COQ=300   Z=-90,000
+  cut  5: TA={A6,A8,A4,A5,A2}  TB={A3,A7}
+          TQ=['Q9'] BQ=[] OQ=['Q4', 'Q7']
+          CTQ=25  CBQ=0  COQ=300   Z=-90,000
+  cut  6: TA={A6,A8,A4,A5,A2,A3}  TB={A7}
+          TQ=['Q7', 'Q9'] BQ=[] OQ=['Q4']
+          CTQ=175  CBQ=0  COQ=150   Z=-22,500
+
+  BEST SPLIT: Z = 7,500 at cut 1
+    F_a: voyage_id (key) + A6=atd
+    F_b: voyage_id (key) + A2=vessel_id, A3=port_id, A4=eta, A5=ata, A7=berth_no, A8=status
+    record sizes: F_a=12B  F_b=42B   (original 50B, overhead +4B from key replication)
+
+==============================================================================
+RELATION: CONSIGNEE   (5 attributes after key exclusion)
+==============================================================================
+
+ATTRIBUTE USAGE MATRIX (rows = transactions)
+          A2    A3    A4    A5    A6    freq
+  Q6       1     0     0     0     0      105
+  Q8       1     0     0     0     0      180
+
+ATTRIBUTE AFFINITY MATRIX
+            A2      A3      A4      A5      A6
+  A2       285       0       0       0       0
+  A3         0       0       0       0       0
+  A4         0       0       0       0       0
+  A5         0       0       0       0       0
+  A6         0       0       0       0       0
+
+BEA ORDERING
+  place A4: max contribution 0 at position 1
+  place A5: max contribution 0 at position 1
+  place A6: max contribution 0 at position 1
+  clustered order: A6 A5 A4 A2 A3
+
+CLUSTERED AFFINITY MATRIX
+            A6      A5      A4      A2      A3
+  A6         0       0       0       0       0
+  A5         0       0       0       0       0
+  A4         0       0       0       0       0
+  A2         0       0       0     285       0
+  A3         0       0       0       0       0
+
+SPLIT QUALITY  Z = (CTQ x CBQ) - COQ^2
+  cut  1: TA={A6}  TB={A5,A4,A2,A3}
+          TQ=[] BQ=['Q6', 'Q8'] OQ=[]
+          CTQ=0  CBQ=285  COQ=0   Z=0
+  cut  2: TA={A6,A5}  TB={A4,A2,A3}
+          TQ=[] BQ=['Q6', 'Q8'] OQ=[]
+          CTQ=0  CBQ=285  COQ=0   Z=0
+  cut  3: TA={A6,A5,A4}  TB={A2,A3}
+          TQ=[] BQ=['Q6', 'Q8'] OQ=[]
+          CTQ=0  CBQ=285  COQ=0   Z=0
+  cut  4: TA={A6,A5,A4,A2}  TB={A3}
+          TQ=['Q6', 'Q8'] BQ=[] OQ=[]
+          CTQ=285  CBQ=0  COQ=0   Z=0
+
+  BEST SPLIT: Z = 0 at cut 1
+    F_a: consignee_id (key) + A6=gstin
+    F_b: consignee_id (key) + A2=name, A3=street_line, A4=area, A5=pincode
+    record sizes: F_a=19B  F_b=110B   (original 125B, overhead +4B from key replication)
+    COLD (no transaction touches): A3=street_line, A4=area, A5=pincode, A6=gstin
+
+==============================================================================
+RELATION: GATE_MOVE   (7 attributes after key exclusion)
+==============================================================================
+
+ATTRIBUTE USAGE MATRIX (rows = transactions)
+          A2    A3    A4    A5    A6    A7    A8    freq
+  Q8       1     1     1     1     0     0     0      180
+  U1       1     1     1     1     1     1     1    23200
+
+ATTRIBUTE AFFINITY MATRIX
+            A2      A3      A4      A5      A6      A7      A8
+  A2     23380   23380   23380   23380   23200   23200   23200
+  A3     23380   23380   23380   23380   23200   23200   23200
+  A4     23380   23380   23380   23380   23200   23200   23200
+  A5     23380   23380   23380   23380   23200   23200   23200
+  A6     23200   23200   23200   23200   23200   23200   23200
+  A7     23200   23200   23200   23200   23200   23200   23200
+  A8     23200   23200   23200   23200   23200   23200   23200
+
+BEA ORDERING
+  place A4: max contribution 7,602,435,200 at position 1
+  place A5: max contribution 7,602,435,200 at position 1
+  place A6: max contribution 7,568,768,000 at position 1
+  place A7: max contribution 7,568,768,000 at position 6
+  place A8: max contribution 7,535,360,000 at position 1
+  clustered order: A8 A6 A5 A4 A2 A3 A7
+
+CLUSTERED AFFINITY MATRIX
+            A8      A6      A5      A4      A2      A3      A7
+  A8     23200   23200   23200   23200   23200   23200   23200
+  A6     23200   23200   23200   23200   23200   23200   23200
+  A5     23200   23200   23380   23380   23380   23380   23200
+  A4     23200   23200   23380   23380   23380   23380   23200
+  A2     23200   23200   23380   23380   23380   23380   23200
+  A3     23200   23200   23380   23380   23380   23380   23200
+  A7     23200   23200   23200   23200   23200   23200   23200
+
+SPLIT QUALITY  Z = (CTQ x CBQ) - COQ^2
+  cut  1: TA={A8}  TB={A6,A5,A4,A2,A3,A7}
+          TQ=[] BQ=['Q8'] OQ=['U1']
+          CTQ=0  CBQ=180  COQ=23,200   Z=-538,240,000
+  cut  2: TA={A8,A6}  TB={A5,A4,A2,A3,A7}
+          TQ=[] BQ=['Q8'] OQ=['U1']
+          CTQ=0  CBQ=180  COQ=23,200   Z=-538,240,000
+  cut  3: TA={A8,A6,A5}  TB={A4,A2,A3,A7}
+          TQ=[] BQ=[] OQ=['Q8', 'U1']
+          CTQ=0  CBQ=0  COQ=23,380   Z=-546,624,400
+  cut  4: TA={A8,A6,A5,A4}  TB={A2,A3,A7}
+          TQ=[] BQ=[] OQ=['Q8', 'U1']
+          CTQ=0  CBQ=0  COQ=23,380   Z=-546,624,400
+  cut  5: TA={A8,A6,A5,A4,A2}  TB={A3,A7}
+          TQ=[] BQ=[] OQ=['Q8', 'U1']
+          CTQ=0  CBQ=0  COQ=23,380   Z=-546,624,400
+  cut  6: TA={A8,A6,A5,A4,A2,A3}  TB={A7}
+          TQ=['Q8'] BQ=[] OQ=['U1']
+          CTQ=180  CBQ=0  COQ=23,200   Z=-538,240,000
+
+  BEST SPLIT: Z = -538,240,000 at cut 1
+    F_a: move_id (key) + A8=operator_id
+    F_b: move_id (key) + A2=cont_id, A3=port_id, A4=ts, A5=direction, A6=truck_no, A7=gate_no
+    record sizes: F_a=8B  F_b=42B   (original 46B, overhead +4B from key replication)
+
+  EXHAUSTIVE over all 4,094 binary partitions: optimum Z = 106,932,375  (4 tied partitions)
+    smallest hot fragment: cont_id + A6=seal_no, A11=customs_status
+    CTQ=25,980  CBQ=4,170  COQ=1,185
+    BEA's contiguous answer (Z = 102,657,375) ranks 5 of 4,094; gap 4.0%
+
+  EXHAUSTIVE over all 4,094 binary partitions: optimum Z = -6,748,622,500  (6 tied partitions)
+    smallest hot fragment: cont_id + A8=line_id
+    CTQ=0  CBQ=31,185  COQ=82,150
+  => with 82,000 whole-tuple ops/day admitted, best Z = -6,748,622,500
